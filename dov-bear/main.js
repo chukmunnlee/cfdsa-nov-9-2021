@@ -15,7 +15,6 @@ const rnd = (range = 14, total = 4) => {
 		nums[i] = nums[idx]
 		nums[idx] = t
 	}
-
 	return nums.splice(0, total)
 }
 
