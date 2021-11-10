@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: bggapp-deploy
+   labels:
+      app: bgg
+      tier: backend
+spec:
+   replicas: 3
+   selector:
+      matchLabels: 
+         app: bgg
+         tier: backend
+   minReadySeconds: 5
+   strategy:
+      type: RollingUpdate
+      rollingUpdate:
+         maxSurge: 25%
+         maxUnavailable: 25%
+   template:
+      metadata:
+         name: bggapp-pod
+         labels:
+            app: bgg
+            tier: backend
+      spec:
+         containers:
+         - name: bggapp-container
+           #image: stackupiss/bgg-backend:v1
+           image: stackupiss/bgg-backend:v2
+           envFrom:
+           - configMapRef:
+              name: bgg-cm
+           - secretRef:
+              name: bgg-secret
+           ports:
+           - containerPort: 3000
+           livenessProbe:
+              httpGet:
+                 path: /healthz
+                 port: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: bggapp-svc
+   labels:
+      app: bgg
+      tier: backend
+spec:
+   type: ClusterIP
+   selector:
+      app: bgg
+      tier: backend
+   ports:
+   - port: 8080
+     targetPort: 3000

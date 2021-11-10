@@ -32,7 +32,8 @@ spec:
         image: stackupiss/dov-bear:v2 
         imagePullPolicy: IfNotPresent
         ports: 
-        - containerPort: 3000
+        - name: dov-port 
+          containerPort: 3000
         env: 
         - name: INSTANCE_HASH
           valueFrom:
@@ -41,3 +42,20 @@ spec:
         envFrom:
         - configMapRef:
             name: dov-cm
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: dov-svc
+   labels:
+      app: dov-bear
+spec:
+   type: LoadBalancer
+   selector:
+      app: dov-bear
+      name: dov-pod
+   ports:
+   - name: dov-svc-port 
+     port: 8080
+     targetPort: dov-port
