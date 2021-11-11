@@ -1,0 +1,68 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dov-cm
+  labels:
+    app: dov-bear
+data:
+  INSTANCE_NAME: dov-bear
+
+---
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: dov-deploy
+  labels:
+    app: dov-bear
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      name: dov-pod
+  template:
+    metadata:
+      name: dov-pod
+      labels:
+        app: dov-bear
+        name: dov-pod
+    spec:
+      volumes:
+      - name: config-vol
+        configMap:
+           name: myconfig
+      containers:
+      - name: dov-container
+        image: stackupiss/dov-bear:v2 
+        imagePullPolicy: IfNotPresent
+        ports: 
+        - name: dov-port 
+          containerPort: 3000
+        env: 
+        - name: INSTANCE_HASH
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        envFrom:
+        - configMapRef:
+            name: dov-cm
+        volumeMounts:
+        - name: config-vol
+          mountPath: /config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: dov-svc
+   labels:
+      app: dov-bear
+spec:
+   type: LoadBalancer
+   selector:
+      app: dov-bear
+      name: dov-pod
+   ports:
+   - name: dov-svc-port 
+     port: 8080
+     targetPort: dov-port

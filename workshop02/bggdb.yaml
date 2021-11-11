@@ -19,12 +19,19 @@ spec:
             app: bgg
             tier: persistence
       spec:
+         volumes:
+         - name: bggdb-vol
+           persistentVolumeClaim:
+              claimName: bggdb-pvc
          containers:
          - name: bggdb-container
            image: stackupiss/bgg-database:v1
            imagePullPolicy: IfNotPresent
            ports:
            - containerPort: 3306
+           volumeMounts:
+           - name: bggdb-vol
+             mountPath: /var/lib/mysql
 ---
 apiVersion: v1
 kind: Service
