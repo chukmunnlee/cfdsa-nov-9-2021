@@ -58,7 +58,7 @@ metadata:
    labels:
       app: dov-bear
 spec:
-   type: LoadBalancer
+   type: ClusterIP
    selector:
       app: dov-bear
       name: dov-pod
@@ -66,3 +66,23 @@ spec:
    - name: dov-svc-port 
      port: 8080
      targetPort: dov-port
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress 
+metadata:
+  name: dov-ing
+  labels:
+    app: dov-bear
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: dov-bear-144.126.243.70.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dov-svc
+            port: 
+              name: dov-svc-port
