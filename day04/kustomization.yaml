@@ -32,14 +32,3 @@ configMapGenerator:
 patchesStrategicMerge:
 - ./patch.yaml
 
-replacements:
-- source:
-    name: nwdb
-    kind: Service
-    fieldPath: metadata.name
-  targets:
-  - select: 
-      name: nwapp 
-      kind: Deployment
-    fieldPaths:
-    - spec.template.spec.containers.[name=northwind-app].env.[name=DB_HOST].value
