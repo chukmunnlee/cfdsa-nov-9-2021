@@ -12,24 +12,22 @@ spec:
       app: nwapp
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: nwapp
     spec:
       containers:
       - image: stackupiss/northwind-app:v1
-        name: nortwind-app
+        name: northwind-app
         env:
         - name: DB_HOST
           value: bggdb-cluster-mysql-master
-        - name: DB_USER
-          value: root
-        - name: DB_PASSWORD
-          value: changeit
         - name: INSTANCE_IP_ADDRESS
           valueFrom:
              fieldRef:
                 fieldPath: metadata.name
+        envFrom:
+        - configMapRef: 
+            name: nwapp-cm
         ports:
         - containerPort: 3000
 ---

@@ -1,13 +1,39 @@
-apiVersion: v1
-kind: Pod
+---
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   labels:
-    run: nwdb
+    app: nwdb
   name: nwdb
 spec:
-  containers:
-     - image: chukmunnlee/bgg-database:v3.1
-       imagePullPolicy: IfNotPresent
-       name: nwdb
-       ports:
-       - containerPort: 3306
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nwdb
+  template:
+    metadata:
+      labels:
+        app: nwdb
+    spec:
+      containers:
+      - image: stackupiss/nortwind-db:v1
+        name: nortwind-db
+        ports:
+        - containerPort: 3306
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nwdb
+  name: nwdb
+spec:
+  selector:
+    app: nwdb
+  type: ClusterIP
+  ports:
+  - name: 3306-3306
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
